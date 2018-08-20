@@ -6,7 +6,7 @@
         "google/apiclient": "^2.0",
         "composer-plugin-api": "^1.1"
     },
-    "license": "GPL-3.0-or-later ",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Nick Wilde",

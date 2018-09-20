@@ -18,11 +18,7 @@ class DrupalSpecGherkinDumper extends BaseCommand {
   }
 
   public function execute(InputInterface $input, OutputInterface $output) {
-    if (!class_exists('\Google_Client')) {
-      // This makes no sense, but it appears composer commands don't load the
-      // composer autoload? Without this, Google_Client is not being found.
-      include_once('vendor/autoload.php');
-    }
+    include_once('vendor/autoload.php');
     $package = $this->getComposer()->getPackage();
     $name = $package->getName();
     $extra = $package->getExtra();
@@ -38,6 +34,9 @@ class DrupalSpecGherkinDumper extends BaseCommand {
     if (!isset($config['feature-path'])) {
       $config['feature-path'] = 'tests/features';
     }
+    if (!is_dir($config['feature-path'])) {
+      mkdir($config['feature-path'], 0777, true);
+    }
     if (!isset($config['credentials-path'])) {
       throw new \InvalidArgumentException("drupal-spec-dump-gherkin command requires extra.drupal-spec-tool.credentials-path key to be set.");
     }
@@ -48,13 +47,14 @@ class DrupalSpecGherkinDumper extends BaseCommand {
     $client = $this->getClient($name, $config['credentials-path'], $io);
     $range = 'Behat!A4:B17';
     $data = $this->getData($client, $config['spreadsheet'], $range);
-    //$io->write(var_export($data,TRUE));
+
     foreach ($data as $row) {
       if ($pos = stripos($row[0], 'feature')) {
         $name = str_replace(' ', '-', strtolower(trim(substr($row[0], 0, $pos))));
         file_put_contents("{$config['feature-path']}/$name.feature", $row[1]);
       }
     }
+    $io->write("Updated all Drupal Spec Features");
 
 
   }

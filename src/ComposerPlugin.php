@@ -33,4 +33,14 @@ class ComposerPlugin implements PluginInterface, Capable
       'Composer\Plugin\Capability\CommandProvider' => 'NickWilde1990\DrupalSpecToolCommands\Command\DrupalSpecCommands',
     ];
   }
+
+  public function deactivate(Composer $composer, IOInterface $io)
+  {
+    // Nothing to deactivate.
+  }
+
+  public function uninstall(Composer $composer, IOInterface $io)
+  {
+    // Nothing to uninstall.
+  }
 }

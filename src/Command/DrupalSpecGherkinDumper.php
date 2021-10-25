@@ -51,7 +51,14 @@ class DrupalSpecGherkinDumper extends BaseCommand {
     foreach ($data as $row) {
       if ($pos = stripos($row[0], 'feature')) {
         $name = str_replace(' ', '-', strtolower(trim(substr($row[0], 0, $pos))));
-        file_put_contents("{$config['feature-path']}/$name.feature", $row[1]);
+        $file_contents = $row[1];
+        $file_contents = str_replace("\r", "\n", $file_contents);
+        while (preg_match('/^ *# paste from (.*) tab\s*$/im', $file_contents, $matches)) {
+          $tab_name = $matches[1];
+          $other_tab = rtrim(implode("\n", array_map(function($row){return $row[0];}, $this->getData($client, $config['spreadsheet'], "'{$tab_name}'!A1:A1000")))) . "\n";
+          $file_contents = preg_replace("/^ *# paste from {$tab_name} tab\\s*$/im", $other_tab, $file_contents);
+        }
+        file_put_contents("{$config['feature-path']}/$name.feature", $file_contents);
       }
     }
     $io->write("Updated all Drupal Spec Features");
